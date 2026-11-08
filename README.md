@@ -23,17 +23,9 @@ import 'package:flutter/material.dart';
         case Tipo.Poupar:   return 'Poupança';
         case Tipo.Resgatar: return 'Resgate Poupança';}}}
 
-enum Categoria{Salario,Banco,Transferencia,Alimentacao;
-  String get label {
-    switch (this){
-      case Categoria.Salario:       return 'Salario';
-      case Categoria.Banco:         return 'Banco';
-      case Categoria.Transferencia: return 'Transferencia';
-      case Categoria.Alimentacao:   return 'Alimentacao';}}}
-
   class Transacao{
     final String id;        final DateTime data;
-    final Tipo tipo;        final Categoria categoria;   //'Alimentação', 'Moradia', 'Salario', etc. Cadastrada pelo usuario
+    final Tipo tipo;        final String categoria;   //'Alimentação', 'Moradia', 'Salario', etc. Cadastrada pelo usuario
     final String descricao; final double valor;
     Transacao({
       required this.id,         required this.data,
@@ -63,7 +55,7 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
         descricao: 'Salario Principal',
         valor: 100.00,
         tipo: Tipo.Receita,
-        categoria: Categoria.Salario,
+        categoria: 'Salario',
         data: DateTime.now(),
       ),
       Transacao(
@@ -71,7 +63,7 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
         descricao: 'Supermercado Mensal',
         valor: 10.00,
         tipo: Tipo.Despesa,
-        categoria: Categoria.Alimentacao,
+        categoria: 'Alimentacao',
         data: DateTime.now(),
       ),
       Transacao(
@@ -79,7 +71,7 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
           descricao: 'Poupanca do Mês',
           valor: 20.00,
           tipo: Tipo.Poupar,
-          categoria: Categoria.Banco,
+          categoria: 'Banco',
           data: DateTime.now(),
       ),
       Transacao(
@@ -87,7 +79,7 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
         descricao: 'Resgate de Conta Poupança',
         valor: 5.00,
         tipo: Tipo.Resgatar,
-        categoria: Categoria.Banco,
+        categoria: 'Banco',
         data: DateTime.now(),
       ),
     ];
@@ -198,15 +190,17 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
 //------------------------------------------------------------------------------
 // 5.Formulario de Movimentação-------------------------------------------------
 //------------------------------------------------------------------------------
-    final _descricaoContoller = TextEditingController();
+    final _dataController = TextEditingController();
+    final _descricaoController = TextEditingController();
     final _valorController = TextEditingController();
     Tipo _tipoSelecionado = Tipo.Despesa;
-    Categoria _CategoriaSelecionada = Categoria.Salario;
+    String _CategoriaSelecionada = 'Salario';
     void _abrirFormularioMovimentacao(BuildContext context){
-      _descricaoContoller.clear();
+      _dataController.clear();
+      _descricaoController.clear();
       _valorController.clear();
       _tipoSelecionado = Tipo.Despesa;
-      _CategoriaSelecionada = Categoria.Salario;
+      _CategoriaSelecionada = 'Salario';
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -220,50 +214,63 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
+//Novo Lançamento
                   'Novo Lançamento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,),
                 const SizedBox(height: 16),
+//Data
                 TextField(
-                  controller: _descricaoContoller,
-                  decoration: const InputDecoration(labelText: 'Descrição (EX: Conta de Luz'),
+                  controller: _dataController,
+                  decoration: const InputDecoration(labelText: 'dd/mm/yyyy'),
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: _valorController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Valor (R\$)'),
-                ),
-                const SizedBox(height: 16),
+//Tipo
                 Row(
                   children: [
                     Expanded(
-                        child: DropdownButtonFormField<Tipo>(
-                          initialValue: _tipoSelecionado,
-                          decoration: const InputDecoration(labelText: 'Tipo'),
-                          items: const [
-                            DropdownMenuItem(value: Tipo.Receita, child: Text('Receita')),
-                            DropdownMenuItem(value: Tipo.Despesa, child: Text('Despesa')),
-                            DropdownMenuItem(value: Tipo.Poupar, child: Text('Poupar')),
-                          ],
-                          onChanged: (val) => _tipoSelecionado = val!,
-                        ),
+                      child: DropdownButtonFormField<Tipo>(
+                        initialValue: _tipoSelecionado,
+                        decoration: const InputDecoration(labelText: 'Tipo'),
+                        items: const [
+                          DropdownMenuItem(value: Tipo.Despesa, child: Text('Despesa')),
+                          DropdownMenuItem(value: Tipo.Receita, child: Text('Receita')),
+                          DropdownMenuItem(value: Tipo.Poupar, child: Text('Poupar')),
+                          DropdownMenuItem(value: Tipo.Resgatar, child: Text('Resgatar')),
+                        ],
+                        onChanged: (val) => _tipoSelecionado = val!,
+                      ),
                     ),
                     const SizedBox(width: 16),
+//Categoria
                     Expanded(
-                      child: DropdownButtonFormField<Categoria>(
+                      child: DropdownButtonFormField<String>(
                         initialValue: _CategoriaSelecionada,
                         decoration: const InputDecoration(labelText: 'Categoria'),
                         items: const [
-                          DropdownMenuItem(value: Categoria.Salario, child: Text('Salario')),
-                          DropdownMenuItem(value: Categoria.Banco, child: Text('Banco')),
-                          DropdownMenuItem(value: Categoria.Transferencia, child: Text('Transferencia')),
+                          DropdownMenuItem(value: 'Salario', child: Text('Salario')),
+                          DropdownMenuItem(value: 'Banco', child: Text('Banco')),
+                          DropdownMenuItem(value: 'Transferencia', child: Text('Transferencia')),
                         ],
                         onChanged: (val) => _CategoriaSelecionada = val!,
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+//Descrição
+                TextField(
+                  controller: _descricaoController,
+                  decoration: const InputDecoration(labelText: 'Descrição (EX: Conta de Luz'),
+                ),
+                const SizedBox(height: 12),
+//Valor
+                TextField(
+                  controller: _valorController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(labelText: 'Valor (R\$)'),
+                ),
                 const SizedBox(height: 24),
+//Butão
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -271,7 +278,7 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed:(){
-                    final desc = _descricaoContoller.text;
+                    final desc = _descricaoController.text;
                     final valor = double.tryParse(_valorController.text) ?? 0.0;
                     if  (desc.isEmpty || valor <=0) {
                       return;
@@ -416,9 +423,11 @@ enum Categoria{Salario,Banco,Transferencia,Alimentacao;
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         //Definir a cor do valor dinamicamente
-                        color: transacao.tipo == 'Receita'
+                        color: transacao.tipo == Tipo.Receita || transacao.tipo == Tipo.Resgatar
                           ? Colors.green
-                          :(transacao.tipo == 'Despesa' ? Colors.red : Colors.grey),
+                          :(transacao.tipo == Tipo.Despesa  || transacao.tipo == Tipo.Poupar
+                            ? Colors.red
+                            : Colors.grey),
                       ),
                     ),
                   );
